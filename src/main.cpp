@@ -1,6 +1,10 @@
 #include <stdio.h>
 
 int main(int argc, char const *argv[]) {
-  auto s = 2;
-  return 0;
+#ifdef __linux__ 
+	printf("sam linux\n")
+#elif _WIN32
+	printf("sam win\n");
+#endif
+	return 0;
 }
