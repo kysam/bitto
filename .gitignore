@@ -46,3 +46,6 @@ CTestTestfile.cmake
 *.tlog
 *.pdb
 *.lastbuildstate
+Win32
+Debug
+Release
