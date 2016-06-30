@@ -43,3 +43,6 @@ CTestTestfile.cmake
 *.vcxproj.user
 *.VC.VC.opendb
 *.VC.db
+*.tlog
+*.pdb
+*.lastbuildstate
