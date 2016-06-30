@@ -36,3 +36,10 @@ cmake_install.cmake
 install_manifest.txt
 CTestTestfile.cmake
 *.log
+*.vcxproj
+*.VC
+*.sln
+*.vcxproj.filters
+*.vcxproj.user
+*.VC.VC.opendb
+*.VC.db
