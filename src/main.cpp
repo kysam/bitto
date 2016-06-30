@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 int main(int argc, char const *argv[]) {
-  printf("%s\n", "sam");
+  auto s = 2;
+  printf("%d\n", f(2));
   return 0;
 }
