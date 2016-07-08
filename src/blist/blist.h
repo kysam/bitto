@@ -4,18 +4,18 @@ using std::vector;
 
 struct BListTarget {
   char addr[16];
-}
+};
 
 struct BListItem {
   BListTarget a;
   BListTarget b;
-}
+};
 
 class BList {
   BList();
   ~BList();
 
 public:
-  vector<BlistItem> m_items;
+  vector<BListItem> m_items;
   void Load();
-}
+};

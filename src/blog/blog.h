@@ -3,15 +3,14 @@
 using std::fstream;
 
 class BLog {
-  Blog();
+  BLog();
   ~BLog();
 
-private:
-  static Blog* m_singleton;
 public:
+  static BLog* m_singleton;
   fstream m_stream;
 
-  static Blog* Get();
-  static void Log(const char* str);
+  static BLog* Get();
+  static void Log(const char* format, ...);
   void InitStream();
-}
+};

@@ -1,4 +1,24 @@
-file (GLOB Sources "src" "*.cpp")
-add_executable (bitto ${Sources})
+file (GLOB_RECURSE SRC "src" "*.cpp")
+file (GLOB_RECURSE INC "src" "*.h")
+
+add_executable (bitto ${SRC} ${INC})
+# Credit to Florian @StackOverflow
+function(assign_source_group)
+    foreach(_source IN ITEMS ${ARGN})
+        if (IS_ABSOLUTE "${_source}")
+            file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
+        else()
+            set(source_rel "${_source}")
+        endif()
+        get_filename_component(_source_path "${_source_rel}" PATH)
+        string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
+        source_group("${_source_path_msvc}" FILES "${_source_rel}")
+	message("${_source_path_msvc} - ${_source_rel}")
+    endforeach()
+endfunction(assign_source_group)
+
+assign_source_group(${SRC})
+assign_source_group(${INC})
+
 set_target_properties (bitto PROPERTIES LINKER_LANGUAGE CXX)
 install (TARGETS bitto DESTINATION ../bin)

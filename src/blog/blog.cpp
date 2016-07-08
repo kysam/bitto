@@ -1,14 +1,15 @@
 #include "blog.h"
-BLog::m_singleton = nullptr;
-void BLog::BLog() {
+#include <stdarg.h>
+
+BLog::BLog() {
 
 }
 
-void BLog::~BLog() {
+BLog::~BLog() {
 
 }
 
-Blog* BLog::Get() {
+BLog* BLog::Get() {
   if (m_singleton == nullptr) {
     m_singleton = new BLog;
   }
@@ -20,11 +21,10 @@ void BLog::InitStream() {
 }
 
 void BLog::Log(const char* format, ...) {
-  if (!m_stream.is_open())
+  if (!BLog::m_stream.is_open())
     InitStream();
 
   va_list args;
   va_start(args, format);
   
-
 }
