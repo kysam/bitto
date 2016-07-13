@@ -1,9 +1,9 @@
 #include <vector>
-using std::vector;
-#define BLIST_FILE "blist"
 
 struct BListTarget {
   char addr[16];
+  unsigned short port;
+  char dir[256];
 };
 
 struct BListItem {
@@ -16,6 +16,6 @@ class BList {
   ~BList();
 
 public:
-  vector<BListItem> m_items;
-  void Load();
+  std::vector<BListItem> m_items;
+  void Load(const char* fileName);
 };
