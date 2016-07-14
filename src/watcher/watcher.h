@@ -7,7 +7,6 @@ class BWatcher {
   ~BWatcher();
 
 public:
-  int m_listenSocket;
   BList *m_list;
   std::vector<BConn> m_conns;
   void SetList(BList *list);
