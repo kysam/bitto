@@ -1,3 +1,5 @@
+#ifndef h_blist
+#define h_blist
 #include <vector>
 
 struct BListTarget {
@@ -12,10 +14,11 @@ struct BListItem {
 };
 
 class BList {
-  BList();
-  ~BList();
-
 public:
-  std::vector<BListItem> m_items;
-  void Load(const char* fileName);
+	BList();
+	~BList();
+
+	std::vector<BListItem> m_items;
+	void Load(const char* fileName);
 };
+#endif

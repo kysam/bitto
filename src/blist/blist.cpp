@@ -1,6 +1,6 @@
 #include "blist.h"
-#include "blog.hs"
-#include "common/common.h"
+#include "../blog/blog.h"
+#include "../common/common.h"
 #include <stdio.h>
 #include <fstream>
 
@@ -16,14 +16,15 @@ void BList::Load(const char* fileName) {
     return;
   }
 
-  std::string line;
-  char *lineStr;
-  while(getline(s, line)) {
-    lineStr = line.c_str();
+  char lineBuffer[100];
+  memset(lineBuffer, 0, sizeof(lineBuffer));
+
+  while(s.getline(lineBuffer, 0)) {
     BListTarget a, b;
-    sscanf(lineStr, "%s %s:%d:%s", a.dir, b.addr, b.port, b.dir);
+    sscanf(lineBuffer, "%s %s:%d:%s", a.dir, b.addr, b.port, b.dir);
 
     hostent *host = gethostbyname(b.addr);
-    strcpy(b.addr, inet_ntoa(host->h_addr_list[0]));
+		in_addr** addresses = reinterpret_cast<in_addr**>(host->h_addr_list);
+		strcpy(b.addr, inet_ntoa(*addresses[0]));
   }
 }

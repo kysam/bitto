@@ -3,10 +3,10 @@
 using std::fstream;
 
 class BLog {
+public:
   BLog();
   ~BLog();
 
-public:
   static BLog* m_singleton;
   fstream m_stream;
 

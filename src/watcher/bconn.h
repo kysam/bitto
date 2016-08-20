@@ -1,13 +1,14 @@
-#include "common/common.h"
-#include "blist/blist.h"
+#include "../common/common.h"
+#include "../blist/blist.h"
 
 class BConn {
+public:
   BConn() {
     m_socket = -1;
   };
-  ~BConn();
+  ~BConn() {
+  };
 
-public:
   int m_socket;
   bool Connect(BListTarget *target);
-}
+};

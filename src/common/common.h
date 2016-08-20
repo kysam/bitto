@@ -13,3 +13,7 @@
   #define gethostbyname gethostbyaddr
 #elif _WIN32
 #endif
+
+#define ASIO_STANDALONE
+#define ASIO_HAS_MOVE
+#include "../asio.hpp"
