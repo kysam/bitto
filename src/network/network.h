@@ -2,7 +2,7 @@
 #define h_network
 #include "../common/common.h"
 #include <vector>
-#include "client.h"
+#include "session.h"
 
 class BNetwork {
 public:
@@ -12,7 +12,7 @@ public:
 	static BNetwork* m_singleton;
 	asio::io_service m_io_service;
 	asio::ip::tcp::acceptor m_acceptor;
-	std::vector<ptrBClient> m_clients;
+	std::vector<_ptrSession> m_clients;
 	asio::ip::tcp::socket m_accSocket;
 	static BNetwork* Get();
 

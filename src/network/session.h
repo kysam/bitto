@@ -1,16 +1,18 @@
-#ifndef h_client
-#define h_client
+#ifndef h_session
+#define h_session
 #include "../common/common.h"
 #include "protocol.h"
+#include "databuffer.h"
 
-class BClient
+class BDataBuffer;
+class BSession
 {
 public:
-	BClient(asio::ip::tcp::socket socket);
-	~BClient();
+	BSession(asio::ip::tcp::socket socket);
+	~BSession();
 
 	enum State {
-		kDead,
+		kCreated,
 		kConnected,
 		kReceiving,
 	};
@@ -23,5 +25,5 @@ public:
 	void Receive();
 };
 
-typedef std::shared_ptr<BClient> ptrBClient;
+typedef std::shared_ptr<BSession> _ptrSession;
 #endif

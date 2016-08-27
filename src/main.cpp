@@ -4,6 +4,7 @@
 #include "watcher/watcher.h"
 #include "blog/blog.h"
 #include "network/network.h"
+#define _CRT_SECURE_NO_WARNINGS
 #pragma comment(lib, "ws2_32.lib")
 
 int main(int argc, char const *argv[]) {

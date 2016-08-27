@@ -43,7 +43,7 @@ void BNetwork::Accept() {
 	m_acceptor.async_accept(m_accSocket,
 		[this](std::error_code ec) {
 		if (!ec) {
-			ptrBClient client = std::make_shared<BClient>(std::move(m_accSocket));
+			_ptrSession client = std::make_shared<BSession>(std::move(m_accSocket));
 			client->Start();
 			m_clients.push_back(client);
 			Accept();
