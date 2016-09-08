@@ -1,9 +1,10 @@
 #include "session.h"
+#include "protocol.h"
 
 BSession::BSession(asio::ip::tcp::socket socket) : m_socket(std::move(socket)),
 												 m_dataBuffer(MAX_PACKET_SIZE),
 												 m_state(kCreated) {
-
+	m_targetHeader.m_size = -1;
 }
 
 BSession::~BSession() {

@@ -1,8 +1,8 @@
 #ifndef h_protocol
 #define h_protocol
+#include "../common/common.h"
 
-#include "session.h"
-#define MAX_PACKET_SIZE 100
+#define log_protocol(msg)	BLog::Log("protocol", msg)
 
 class BSession;
 class BProtocol

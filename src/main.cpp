@@ -9,11 +9,17 @@
 
 int main(int argc, char const *argv[]) {
 
+/*
 	BList list;
 	list.Load("blist");
 	BWatcher watcher;
 	watcher.SetList(&list);
-	watcher.Run();
+	watcher.Run();*/
+	int i = 100;
+	while (i > 0) {
+		BLog::Get()->Log("general", "message %d\n", i);
+		i--;
+	}
 
 	return 0;
 }

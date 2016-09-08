@@ -3,7 +3,8 @@
 BNetwork* BNetwork::m_singleton = nullptr;
 
 BNetwork::BNetwork() : m_acceptor(m_io_service),
-											 m_accSocket(m_io_service) {
+					m_accSocket(m_io_service)
+					{
 
 }
 
@@ -18,12 +19,13 @@ BNetwork* BNetwork::Get() {
 	return m_singleton;
 }
 
-void BNetwork::Init() {
-	
+void BNetwork::Init(BList *blist) {
+	m_blist = blist;
 }
 
 void BNetwork::Run(const char* name, short port) {
 	Listen(name, port);
+	Connect();
 	m_io_service.run();
 }
 
@@ -39,11 +41,16 @@ void BNetwork::Listen(const char* name, short port) {
 	Accept();
 }
 
+void BNetwork::Connect(BConnector *connector) {
+	
+}
+
 void BNetwork::Accept() {
 	m_acceptor.async_accept(m_accSocket,
 		[this](std::error_code ec) {
 		if (!ec) {
 			_ptrSession client = std::make_shared<BSession>(std::move(m_accSocket));
+
 			client->Start();
 			m_clients.push_back(client);
 			Accept();

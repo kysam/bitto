@@ -1,10 +1,9 @@
 #ifndef h_session
 #define h_session
 #include "../common/common.h"
-#include "protocol.h"
+#include "protoDef.h"
 #include "databuffer.h"
 
-class BDataBuffer;
 class BSession
 {
 public:
@@ -14,12 +13,12 @@ public:
 	enum State {
 		kCreated,
 		kConnected,
-		kReceiving,
 	};
 
 	BDataBuffer m_dataBuffer;
 	State m_state;
 	asio::ip::tcp::socket m_socket;
+	BPHeader m_targetHeader;
 
 	void Start();
 	void Receive();

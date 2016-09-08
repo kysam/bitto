@@ -12,16 +12,15 @@ public:
 		delete[] m_raw;
 	};
 
-private:
 	unsigned char *m_raw;
-	int m_pos;
+	int m_wPos;
 	int m_maxSize;
 
 public:
 	unsigned char *GetIn();
 	void AdvancePos(int len);
+	int GetWPos() { return m_wPos; };
 	int GetAvailable();
-	unsigned char GetNextSingle();
 };
 
 #endif

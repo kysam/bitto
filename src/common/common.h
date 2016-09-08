@@ -17,3 +17,5 @@
 #define ASIO_STANDALONE
 #define ASIO_HAS_MOVE
 #include "../asio.hpp"
+
+#define CAST2VAR(raw, type) *reinterpret_cast<type*>(raw)

@@ -11,6 +11,6 @@ public:
   fstream m_stream;
 
   static BLog* Get();
-  static void Log(const char* format, ...);
+  static void Log(const char *section, const char *format, ...);
   void InitStream();
 };

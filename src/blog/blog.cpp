@@ -19,7 +19,7 @@ void BLog::InitStream() {
 	m_stream.open(BLOG_FILE, std::ios::in | std::ios::out | std::ios::trunc);
 }
 
-void BLog::Log(const char* format, ...) {
+void BLog::Log(const char *section, const char *format, ...) {
 	struct Token {
 		Token(char* str, int size) {
 			m_pos = -1;
@@ -74,7 +74,7 @@ void BLog::Log(const char* format, ...) {
 		}
 	}
 
-	int marker = 0;
+	int marker = 0;	//marker in the original format string
 	char* newStr = new char[newLen + 1];
 	newStr[newLen] = '\0';
 	int c = 0;
@@ -89,6 +89,9 @@ void BLog::Log(const char* format, ...) {
 		tokens[i].Dispose();
 	}
 
+	memcpy(&newStr[c], &format[marker], strlen(format) - marker);	//copy the rest of the ori. fmt. string
+
+	BLog::Get()->m_stream << "[" << section << "] ";
 	BLog::Get()->m_stream << newStr;
 	delete[] newStr;
 	va_end(args);
