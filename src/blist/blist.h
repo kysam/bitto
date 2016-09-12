@@ -5,7 +5,7 @@
 #define log_blist(msg)	BLog::Log("blist", msg)
 
 struct BListTarget {
-	char dir[256];
+	char dir[260];
 };
 
 struct BListItem {

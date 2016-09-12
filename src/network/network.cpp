@@ -21,6 +21,13 @@ BNetwork* BNetwork::Get() {
 
 void BNetwork::Init(BList *blist) {
 	m_blist = blist;
+	auto groups = blist->m_itemGroups;
+
+	for (int i = 0; i < groups.size(); i++) {
+		for (int ii = 0; ii < groups[i].items.size(); ii++) {
+			m_masterTargets.push_back(BMasterTarget(m_io_service, asio::ip::address::from_string(groups[i].addr), groups[i].port));
+		}
+	}
 }
 
 void BNetwork::Run(const char* name, short port) {
@@ -41,18 +48,48 @@ void BNetwork::Listen(const char* name, short port) {
 	Accept();
 }
 
-void BNetwork::Connect(BConnector *connector) {
-	
+void BNetwork::Connect() {
+	for (int i = 0; i < m_masterTargets.size(); i++) {
+		m_masterTargets[i].socket.async_connect(m_masterTargets[i].endPoint,
+			[this, i](std::error_code ec) {
+			if (!ec) {
+				_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[idx].socket));
+
+				session->m_type = BSession::kSlave;
+				session->m_blist = m_blist;
+				session->m_blistGroup = m_masterTargets[i].m_blistGroup;
+				session->Start();
+				return;
+			}
+			ContinueConnect(i);
+		});
+	}
+}
+
+void BNetwork::ContinueConnect(int idx) {
+	m_masterTargets[idx].socket.async_connect(m_masterTargets[idx].endPoint,
+		[this, idx](std::error_code ec) {
+		if (!ec) {
+			_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[idx].socket));
+
+			session->m_type = BSession::kSlave;
+			session->m_blist = m_blist;
+			session->Start();
+			return;
+		}
+		ContinueConnect(idx);
+	});
 }
 
 void BNetwork::Accept() {
 	m_acceptor.async_accept(m_accSocket,
 		[this](std::error_code ec) {
 		if (!ec) {
-			_ptrSession client = std::make_shared<BSession>(std::move(m_accSocket));
+			_ptrSession session = std::make_shared<BSession>(std::move(m_accSocket));
+			m_sessions.push_back(session);
 
-			client->Start();
-			m_clients.push_back(client);
+			session->m_type = BSession::kMaster;
+			session->Start();
 			Accept();
 		}
 	});

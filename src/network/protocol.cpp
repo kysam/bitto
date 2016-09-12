@@ -25,7 +25,7 @@ void BProtocol::Process(BSession *session) {
 	BPHeader& targetHeader = session->m_targetHeader;
 
 	if (targetHeader.m_size == -1) {;
-		auto raw = buffer.GetIn();
+		auto raw = buffer.m_raw;
 		targetHeader.Get(raw);
 
 		if (targetHeader.m_magic != PACKET_HEADER_MAGIC) {
@@ -40,10 +40,18 @@ void BProtocol::Process(BSession *session) {
 	}
 
 	if (targetHeader.m_size == buffer.m_wPos) {	//expected packet has come in full
-		switch (targetHeader.m_code) {
-			
+		if (!IsCodeValid(ProtocolCode, session->m_targetHeader.m_code)) {
+			log_protocol("unknown protocol code, terminating session");
+			session->Terminate();
+			return;
 		}
-	}
 
-	
+		if (session->m_currentOp->m_code != session->m_targetHeader.m_code) {
+			log_protocol("operation mismatch, terminating session");
+			session->Terminate();
+			return;
+		}
+
+		session->m_currentOp->Process();	//process current operation
+	}
 }

@@ -5,16 +5,16 @@
 #include "../network/network.h"
 
 BWatcher::BWatcher() {
-	m_list = nullptr;
+	m_blist = nullptr;
 }
 
 BWatcher::~BWatcher() {
 }
 
-void BWatcher::SetList(BList *list) {
-  m_list = list;
+void BWatcher::SetBList(BList *blist) {
+  m_blist = blist;
 }
 void BWatcher::Run() {
-	BNetwork::Get()->Init();
+	BNetwork::Get()->Init(m_blist);
 	BNetwork::Get()->Run("127.0.0.1", 12345);
 }

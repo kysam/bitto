@@ -8,18 +8,10 @@
 #pragma comment(lib, "ws2_32.lib")
 
 int main(int argc, char const *argv[]) {
-
-/*
 	BList list;
 	list.Load("blist");
 	BWatcher watcher;
-	watcher.SetList(&list);
-	watcher.Run();*/
-	int i = 100;
-	while (i > 0) {
-		BLog::Get()->Log("general", "message %d\n", i);
-		i--;
-	}
-
+	watcher.SetBList(&list);
+	watcher.Run();
 	return 0;
 }

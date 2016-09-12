@@ -3,6 +3,10 @@
 #include "../common/common.h"
 #include "protoDef.h"
 #include "databuffer.h"
+#include "../blist/blist.h"
+#include "../blog/blog.h"
+
+#define log_session(msg)	BLog::Log("session", msg)
 
 class BSession
 {
@@ -10,17 +14,28 @@ public:
 	BSession(asio::ip::tcp::socket socket);
 	~BSession();
 
+	enum SessionType {
+		kSlave,
+		kMaster
+	};
 	enum State {
-		kCreated,
+		kIdle,
 		kConnected,
 	};
 
 	BDataBuffer m_dataBuffer;
+	SessionType m_type;
 	State m_state;
 	asio::ip::tcp::socket m_socket;
-	BPHeader m_targetHeader;
+	BPHeader m_targetHeader;	//current header to account incoming data for
+	BPOp *m_currentOp;
+	BList *m_blist;
+	BListItemGroup *m_blistGroup;
 
 	void Start();
+	void StartSlave();
+	void StartMaster();
+	void Terminate();
 	void Receive();
 };
 

@@ -8,8 +8,8 @@ public:
   BWatcher();
   ~BWatcher();
 
-  BList *m_list;
+  BList *m_blist;
   std::vector<BConn> m_conns;
-  void SetList(BList *list);
+  void SetBList(BList *blist);
   void Run();
 };
