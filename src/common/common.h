@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <stdio.h>
 #elif _WIN32
 #include <Winsock2.h>
 #endif

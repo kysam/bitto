@@ -1,7 +1,7 @@
 #include "blog.h"
 #include <stdarg.h>
 #include <vector>
-#include "common/common.h"
+#include "../common/common.h"
 
 BLog* BLog::m_singleton = nullptr;
 
@@ -65,7 +65,7 @@ void BLog::Log(const char *section, const char *format, ...) {
 		else if (format[i + 1] == 'd') {
 			int itg = va_arg(args, int);
 			char buf[10];
-			sprintf_s(buf, sizeof(buf), "%d", itg);
+			sprintf(buf, "%d", itg);
 
 			Token token(buf, strlen(buf));
 			token.m_pos = i;
