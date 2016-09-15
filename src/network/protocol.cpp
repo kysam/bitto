@@ -2,6 +2,7 @@
 #include "../common/common.h"
 #include "../blog/blog.h"
 #include "session.h"
+#include "protoDef.h"
 
 BProtocol* BProtocol::m_singleton = nullptr;
 
@@ -22,36 +23,37 @@ BProtocol* BProtocol::Get() {
 
 void BProtocol::Process(BSession *session) {
 	BDataBuffer& buffer = session->m_dataBuffer;
-	BPHeader& targetHeader = session->m_targetHeader;
+	BPHeader *targetHeader = session->m_targetHeader;
 
-	if (targetHeader.m_size == -1) {;
+	if (targetHeader->m_size == -1) {;
 		auto raw = buffer.m_raw;
-		targetHeader.Get(raw);
+		targetHeader->Get(raw);
 
-		if (targetHeader.m_magic != PACKET_HEADER_MAGIC) {
+		if (targetHeader->m_magic != PACKET_HEADER_MAGIC) {
 			log_protocol("wrong header magic");
 			return;
 		}
 
-		if (targetHeader.m_size > MAX_PACKET_SIZE) {
+		if (targetHeader->m_size > MAX_PACKET_SIZE) {
 			log_protocol("invalid packet size");
 			return;
 		}
 	}
 
-	if (targetHeader.m_size == buffer.m_wPos) {	//expected packet has come in full
-		if (!IsCodeValid(ProtocolCode, session->m_targetHeader.m_code)) {
+	if (targetHeader->m_size == buffer.m_wPos) {	//expected packet has come in full
+		if (!IsCodeValid(ProtocolCode, session->m_targetHeader->m_code)) {
 			log_protocol("unknown protocol code, terminating session");
 			session->Terminate();
 			return;
 		}
 
-		if (session->m_currentOp->m_code != session->m_targetHeader.m_code) {
+		if (session->m_currentOp->m_code != session->m_targetHeader->m_code) {
 			log_protocol("operation mismatch, terminating session");
 			session->Terminate();
 			return;
 		}
 
-		session->m_currentOp->Process();	//process current operation
+		if (session->m_currentOp)
+			session->m_currentOp->Process();	//process current operation
 	}
 }

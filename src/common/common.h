@@ -9,13 +9,9 @@
   #include <Winsock2.h>
 #endif
 
-#ifdef __linux__
-  #define gethostbyname gethostbyaddr
-#elif _WIN32
-#endif
-
 #define ASIO_STANDALONE
 #define ASIO_HAS_MOVE
 #include "../asio.hpp"
 
 #define Cast2Var(raw, type) *reinterpret_cast<type*>(raw)
+

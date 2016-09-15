@@ -1,7 +1,13 @@
+#ifndef h_blog
+#define h_blog
 #include <fstream>
 #define BLOG_FILE "bitto.log"
-using std::fstream;
 
+#define log_blist(msg, ...)	BLog::Log("blist", msg, __VA_ARGS__)
+#define log_session(msg, ...)	BLog::Log("session", msg, __VA_ARGS__)
+#define log_protocol(msg, ...)	BLog::Log("protocol", msg, __VA_ARGS__)
+
+using std::fstream;
 class BLog {
 public:
   BLog();
@@ -14,3 +20,4 @@ public:
   static void Log(const char *section, const char *format, ...);
   void InitStream();
 };
+#endif

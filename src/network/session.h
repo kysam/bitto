@@ -1,13 +1,12 @@
 #ifndef h_session
 #define h_session
 #include "../common/common.h"
-#include "protoDef.h"
 #include "databuffer.h"
 #include "../blist/blist.h"
 #include "../blog/blog.h"
 
-#define log_session(msg)	BLog::Log("session", msg)
-
+struct BPHeader;
+struct BPOp;
 class BSession
 {
 public:
@@ -27,7 +26,7 @@ public:
 	SessionType m_type;
 	State m_state;
 	asio::ip::tcp::socket m_socket;
-	BPHeader m_targetHeader;	//current header to account incoming data for
+	BPHeader *m_targetHeader;	//current header to account incoming data for
 	BPOp *m_currentOp;
 	BList *m_blist;
 	BListItemGroup *m_blistGroup;

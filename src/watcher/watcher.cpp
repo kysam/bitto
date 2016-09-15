@@ -1,7 +1,5 @@
 #include "../watcher/watcher.h"
 #include "../blog/blog.h"
-#define ASIO_STANDALONE
-#include "../asio.hpp"
 #include "../network/network.h"
 
 BWatcher::BWatcher() {

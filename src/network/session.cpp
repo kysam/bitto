@@ -5,13 +5,14 @@
 BSession::BSession(asio::ip::tcp::socket socket) : m_socket(std::move(socket)),
 													m_dataBuffer(MAX_PACKET_SIZE),
 													m_state(kIdle),
-													m_targetHeader(ProtocolCode_end, -1),
 													m_blist(nullptr),
-													m_blistGroup(nullptr) {
+													m_blistGroup(nullptr),
+													m_currentOp(nullptr) {
+	m_targetHeader = new BPHeader(ProtocolCode_end, -1);
 }
 
 BSession::~BSession() {
-
+	delete m_targetHeader;
 }
 
 void BSession::Start() {
@@ -31,13 +32,7 @@ void BSession::StartSlave() {
 	}
 
 	op->Build();
-	asio::async_write(m_socket, asio::buffer(op->m_packet, op->m_packetSize),
-		[this](std::error_code ec, std::size_t cTransferred) {
-		if (ec) {
-			log_session("slave session - write error (code %d)", ec);
-			Terminate();
-			}
-		});
+	op->Send();
 	Receive();
 }
 

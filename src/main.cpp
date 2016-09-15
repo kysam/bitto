@@ -13,5 +13,6 @@ int main(int argc, char const *argv[]) {
 	BWatcher watcher;
 	watcher.SetBList(&list);
 	watcher.Run();
+	BLog::Log("main", "finished");
 	return 0;
 }

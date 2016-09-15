@@ -2,7 +2,6 @@
 #define h_protocol
 #include "../common/common.h"
 
-#define log_protocol(msg)	BLog::Log("protocol", msg)
 
 class BSession;
 class BProtocol

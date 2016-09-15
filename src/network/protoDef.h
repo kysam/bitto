@@ -10,6 +10,8 @@
 
 #include "../common/common.h"
 #include "../common/utils.h"
+#include "../blog/blog.h"
+#include "session.h"
 
 enum ProtocolCode : unsigned char {
 	//code from slave
@@ -54,7 +56,6 @@ struct BPOp {
 
 struct BPOp_request_checksums : BPOp {
 	//data for both request/answer
-	std::vector<int> m_checksums;
 	struct ChecksumFile {
 		char fileName[MAX_FILE_NAME];
 		int checksum;
@@ -72,19 +73,19 @@ struct BPOp_request_checksums : BPOp {
 	};
 
 	BPOp_request_checksums(BSession *session) : BPOp(session) {
-		m_packet = nullptr;
 		m_code = request_checksums;
+		m_cPacketSent = 0;
 	};
 	~BPOp_request_checksums() {
-		if (m_packet != nullptr)
-			delete[] m_packet;
 	}
 	
-	unsigned char *m_packet;
-	int m_packetSize;
+	BSession *m_session;
+	std::vector<int> m_checksums;
+	std::vector<BLimitBuffer> m_packets;
 	std::vector<ChecksumGroup> m_checksumGroups;
+	int m_cPacketSent;	//number of packets in m_packets sent
 
-	void Process() {	//process this protocol code for m_session
+	void Process() {
 
 	}
 
@@ -98,39 +99,46 @@ struct BPOp_request_checksums : BPOp {
 	}
 
 	void Build() {	//build the request packet
-		int packetSize = 0;
-		packetSize += sizeof(BPHeader);
-
-		for (int i = 0; i < m_checksumGroups.size(); i++) {
-			packetSize += strlen(m_checksumGroups[i].path);
-			
-			for (int ii = 0; ii < m_checksumGroups[i].m_files.size(); ii++) {
-				packetSize += strlen(m_checksumGroups[i].m_files[ii].fileName);
-			}
-			packetSize += sizeof(ElementCode) * m_checksumGroups[i].m_files.size();
-		}
-
-		packetSize += sizeof(ElementCode) * m_checksumGroups.size();
-		m_packet = new unsigned char[packetSize];
-		m_packetSize = packetSize;
-		BBufferMan packet(m_packet, packetSize);
-
 		//set header for packet
-		BPHeader header(request_checksums, packetSize);
-		packet.Append(&header, sizeof(header));
+		BPHeader header(request_checksums, 0);
+		m_packets.push_back(BLimitBuffer(MAX_PACKET_SIZE));
+		BLimitBuffer *packet = &m_packets.back();
+		packet->Append(&header, sizeof(header));
 
 		//append checksum groups and files
 		for (int i = 0; i < m_checksumGroups.size(); i++) {
-			packet.AppendK<ElementCode>(checksum_group);
-			packet.Append(m_checksumGroups[i].path, strlen(m_checksumGroups[i].path));
+			if (packet->m_overflowed) {
+				//modify current packet's header
+				BPHeader *header = Cast2Var(packet->m_raw, BPHeader*);
+				header->m_size = packet->m_size;
+				m_packets.push_back(BLimitBuffer(MAX_PACKET_SIZE));
+				packet = &m_packets.back();
+			}
+
+			packet->AppendK<ElementCode>(checksum_group);
+			packet->Append(m_checksumGroups[i].path, strlen(m_checksumGroups[i].path));
 
 			for (int ii = 0; ii < m_checksumGroups[i].m_files.size(); ii++) {
-				packet.AppendK<ElementCode>(checksum_file);
-				packet.Append(m_checksumGroups[i].m_files[ii].fileName, strlen(m_checksumGroups[i].m_files[ii].fileName));
+				packet->AppendK<ElementCode>(checksum_file);
+				packet->Append(m_checksumGroups[i].m_files[ii].fileName, strlen(m_checksumGroups[i].m_files[ii].fileName));
 			}
 		}
 	};
 
+	void Send() {
+		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent].m_raw, m_packets[m_cPacketSent].m_size),
+			[this](std::error_code ec, std::size_t cTransferred) {
+			if (ec) {
+				log_session("slave session - write error (code %d)", ec);
+				m_session->Terminate();
+			}
+
+			if (m_cPacketSent < m_packets.size()) {
+				Send();
+				m_cPacketSent++;
+			}
+		});
+	}
 };
 
 #endif

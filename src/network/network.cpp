@@ -53,7 +53,7 @@ void BNetwork::Connect() {
 		m_masterTargets[i].socket.async_connect(m_masterTargets[i].endPoint,
 			[this, i](std::error_code ec) {
 			if (!ec) {
-				_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[idx].socket));
+				_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[i].socket));
 
 				session->m_type = BSession::kSlave;
 				session->m_blist = m_blist;

@@ -2,7 +2,6 @@
 #define h_blist
 #include <vector>
 
-#define log_blist(msg)	BLog::Log("blist", msg)
 
 struct BListTarget {
 	char dir[260];
