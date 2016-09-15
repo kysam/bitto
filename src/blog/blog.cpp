@@ -1,6 +1,7 @@
 #include "blog.h"
 #include <stdarg.h>
 #include <vector>
+#include "common/common.h"
 
 BLog* BLog::m_singleton = nullptr;
 

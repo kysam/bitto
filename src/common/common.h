@@ -1,12 +1,13 @@
 // Includes based on OS
 #ifdef __linux__
-  #include <netdb.h>
-  #include <sys/types.h>
-  #include <sys/socket.h>
-  #include <netinet/in.h>
-  #include <arpa/inet.h>
+#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <string.h>
 #elif _WIN32
-  #include <Winsock2.h>
+#include <Winsock2.h>
 #endif
 
 #define ASIO_STANDALONE
