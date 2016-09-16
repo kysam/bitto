@@ -25,7 +25,9 @@ void BNetwork::Init(BList *blist) {
 
 	for (int i = 0; i < groups.size(); i++) {
 		for (int ii = 0; ii < groups[i].items.size(); ii++) {
-			m_masterTargets.push_back(BMasterTarget(m_io_service, asio::ip::address::from_string(groups[i].addr), groups[i].port));
+			asio::ip::address addr;
+			addr.from_string(groups[i].addr);
+			m_masterTargets.push_back(BMasterTarget(m_io_service, addr, groups[i].port));
 		}
 	}
 }
