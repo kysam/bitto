@@ -23,15 +23,16 @@ public:
 	BNetwork();
 	~BNetwork();
 
+
 	static BNetwork* m_singleton;
-	asio::io_service m_io_service;
+	static asio::io_service m_io_service;
 	asio::ip::tcp::acceptor m_acceptor;
 	std::vector<_ptrSession> m_sessions;
 	asio::ip::tcp::socket m_accSocket;
 	std::vector<BMasterTarget> m_masterTargets;
 	BList *m_blist;
-	static BNetwork* Get();
 
+	static BNetwork* Get();
 	void Init(BList *blist);
 	void Run(const char* name, short port);
 	void Listen(const char* ip, short port);

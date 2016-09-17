@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include <vector>
 #include "../common/common.h"
+#include <iostream>
 
 BLog* BLog::m_singleton = nullptr;
 
@@ -93,7 +94,9 @@ void BLog::Log(const char *section, const char *format, ...) {
 	memcpy(&newStr[c], &format[marker], strlen(format) - marker);	//copy the rest of the ori. fmt. string
 
 	BLog::Get()->m_stream << "[" << section << "] ";
-	BLog::Get()->m_stream << newStr;
+	BLog::Get()->m_stream << newStr << '\n';
+	std::cout << "[" << section << "] ";
+	std::cout << newStr << '\n';
 	delete[] newStr;
 	va_end(args);
 }

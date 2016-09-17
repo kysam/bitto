@@ -17,6 +17,7 @@ BSession::~BSession() {
 
 void BSession::Start() {
 	m_state = kConnected;
+	log_session("starting %s session", m_type == kMaster ? "master" : "slave");
 	m_type == kMaster ? StartMaster() : StartSlave();
 	
 }

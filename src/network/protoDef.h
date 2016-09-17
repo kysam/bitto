@@ -129,7 +129,7 @@ struct BPOp_request_checksums : BPOp {
 		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent].m_raw, m_packets[m_cPacketSent].m_size),
 			[this](std::error_code ec, std::size_t cTransferred) {
 			if (ec) {
-				log_session("slave session - write error (code %d)", ec);
+				log_session("write error (code %d)", ec);
 				m_session->Terminate();
 			}
 

@@ -1,6 +1,7 @@
 #include "network.h"
 
 BNetwork* BNetwork::m_singleton = nullptr;
+asio::io_service BNetwork::m_io_service;
 
 BNetwork::BNetwork() : m_acceptor(m_io_service),
 					m_accSocket(m_io_service)

@@ -3,6 +3,7 @@
 #include "../common/common.h"
 #include <stdio.h>
 #include <fstream>
+#include "../network/network.h"
 
 BList::BList() {}
 
@@ -20,15 +21,18 @@ void BList::Load(const char* fileName) {
   memset(lineBuffer, 0, sizeof(lineBuffer));
 
   BListItemGroup *currGroup = nullptr;
-  while(s.getline(lineBuffer, 0)) {
+  
+  while(s.getline(lineBuffer, 100)) {
 	  if (lineBuffer[0] == '@') {
 		  m_itemGroups.push_back(BListItemGroup());
 		  currGroup = &m_itemGroups.back();
-		  sscanf(lineBuffer, "@%s:%d", currGroup->addr, &currGroup->port);
-
-		  hostent *host = gethostbyname(currGroup->addr);
-		  in_addr** addresses = reinterpret_cast<in_addr**>(host->h_addr_list);
-		  strcpy(currGroup->addr, inet_ntoa(*addresses[0]));
+		  sscanf(lineBuffer, "@%[^:]:%d", currGroup->addr, &currGroup->port);
+		  log_blist(currGroup->addr);
+		  asio::ip::tcp::resolver resolver(BNetwork::m_io_service);
+		  asio::ip::tcp::resolver::query query(currGroup->addr, "");
+		  asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+		  
+		  strcpy(currGroup->addr, (*it).endpoint().address().to_string().c_str());
 		  continue;
 	  }
 

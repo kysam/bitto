@@ -6,6 +6,8 @@
 #define log_blist(msg, ...)	BLog::Log("blist", msg, ## __VA_ARGS__)
 #define log_session(msg, ...)	BLog::Log("session", msg, ## __VA_ARGS__)
 #define log_protocol(msg, ...)	BLog::Log("protocol", msg, ## __VA_ARGS__)
+#define log_network(msg, ...)	BLog::Log("network", msg, ## __VA_ARGS__)
+
 
 using std::fstream;
 class BLog {
