@@ -16,4 +16,4 @@
 #include "../asio.hpp"
 
 #define Cast2Var(raw, type) *reinterpret_cast<type*>(raw)
-
+#define SleepFor(mili)	std::this_thread::sleep_for(std::chrono::milliseconds(mili))

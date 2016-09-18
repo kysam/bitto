@@ -70,7 +70,7 @@ void BNetwork::Listen(const char* name, short port) {
 void BNetwork::Connect() {
 	m_connThread = new std::thread([this] {
 		while (true) {
-			Sleep(200);
+			SleepFor(200);
 			for (int i = 0; i < m_masterTargets.size(); i++) {
 				if (m_targetConnected[i])
 					continue;
