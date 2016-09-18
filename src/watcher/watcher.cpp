@@ -15,4 +15,7 @@ void BWatcher::SetBList(BList *blist) {
 void BWatcher::Run() {
 	BNetwork::Get()->Init(m_blist);
 	BNetwork::Get()->Run("0.0.0.0", 12345);
+	while (true) {
+		Sleep(1000);
+	}
 }

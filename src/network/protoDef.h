@@ -79,14 +79,15 @@ struct BPOp_request_checksums : BPOp {
 	~BPOp_request_checksums() {
 	}
 	
-	BSession *m_session;
 	std::vector<int> m_checksums;
 	std::vector<BLimitBuffer> m_packets;
 	std::vector<ChecksumGroup> m_checksumGroups;
 	int m_cPacketSent;	//number of packets in m_packets sent
 
 	void Process() {
-
+		unsigned char *packet = m_session->m_dataBuffer.m_raw;
+		BPHeader *header = Cast2Var(packet, BPHeader*);
+		log_protocol("processing code %d", header->m_code);
 	}
 
 	void MapFrom(unsigned char *raw) {	//read the request answer packet
@@ -133,7 +134,7 @@ struct BPOp_request_checksums : BPOp {
 				m_session->Terminate();
 			}
 
-			if (m_cPacketSent < m_packets.size()) {
+			if (m_cPacketSent < m_packets.size() - 1) {
 				Send();
 				m_cPacketSent++;
 			}

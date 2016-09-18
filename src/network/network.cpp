@@ -10,7 +10,10 @@ BNetwork::BNetwork() : m_acceptor(m_io_service),
 }
 
 BNetwork::~BNetwork() {
-
+	m_connThread->join();
+	m_ioThread->join();
+	delete m_connThread;
+	delete m_ioThread;
 }
 
 BNetwork* BNetwork::Get() {
@@ -24,19 +27,32 @@ void BNetwork::Init(BList *blist) {
 	m_blist = blist;
 	auto groups = blist->m_itemGroups;
 
+	asio::ip::tcp::resolver resolver(m_io_service);
 	for (int i = 0; i < groups.size(); i++) {
 		for (int ii = 0; ii < groups[i].items.size(); ii++) {
-			asio::ip::address addr;
-			addr.from_string(groups[i].addr);
-			m_masterTargets.push_back(BMasterTarget(m_io_service, addr, groups[i].port));
+			char port[10];
+
+			itoa(groups[i].port, port, 10);
+			m_masterTargets.push_back(BMasterTarget(m_io_service, 
+				std::move(resolver.resolve({groups[i].addr, port})), &groups[i]));
 		}
+	}
+
+	m_targetConnected = new bool[m_masterTargets.size()];
+	m_targetElapsed = new float[m_masterTargets.size()];
+	for (int i = 0; i < m_masterTargets.size(); i++) {
+		m_targetConnected[i] = false;
+		m_targetElapsed[i] = clock() / 1000.0f;
 	}
 }
 
 void BNetwork::Run(const char* name, short port) {
+	m_ioThread = new std::thread([this] {
+		m_io_service.run();
+	});
+
 	Listen(name, port);
 	Connect();
-	m_io_service.run();
 }
 
 void BNetwork::Listen(const char* name, short port) {
@@ -52,35 +68,34 @@ void BNetwork::Listen(const char* name, short port) {
 }
 
 void BNetwork::Connect() {
-	for (int i = 0; i < m_masterTargets.size(); i++) {
-		m_masterTargets[i].socket.async_connect(m_masterTargets[i].endPoint,
-			[this, i](std::error_code ec) {
-			if (!ec) {
-				_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[i].socket));
+	m_connThread = new std::thread([this] {
+		while (true) {
+			Sleep(200);
+			for (int i = 0; i < m_masterTargets.size(); i++) {
+				if (m_targetConnected[i])
+					continue;
+				if (((clock() / 1000.0f) - m_targetElapsed[i]) < 0.5f)
+					continue;
 
-				session->m_type = BSession::kSlave;
-				session->m_blist = m_blist;
-				session->m_blistGroup = m_masterTargets[i].m_blistGroup;
-				session->Start();
-				return;
+				m_targetElapsed[i] = clock() / 1000.0f;
+				log_network("connecting to %s", m_masterTargets[i].m_epIterator->host_name().c_str());
+
+				asio::async_connect(m_masterTargets[i].m_socket, m_masterTargets[i].m_epIterator,
+					[this, i](std::error_code ec, asio::ip::tcp::resolver::iterator) {
+					if (!ec) {
+						_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[i].m_socket));
+						session->m_type = BSession::kSlave;
+						session->m_blist = m_blist;
+
+						session->m_blistGroup = m_masterTargets[i].m_blistGroup;
+						session->Start();
+						m_targetConnected[i] = true;
+						return;
+					}
+					log_network("connect to failed, trying again...", m_masterTargets[i].m_epIterator->host_name().c_str());
+				});
 			}
-			ContinueConnect(i);
-		});
-	}
-}
-
-void BNetwork::ContinueConnect(int idx) {
-	m_masterTargets[idx].socket.async_connect(m_masterTargets[idx].endPoint,
-		[this, idx](std::error_code ec) {
-		if (!ec) {
-			_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[idx].socket));
-
-			session->m_type = BSession::kSlave;
-			session->m_blist = m_blist;
-			session->Start();
-			return;
 		}
-		ContinueConnect(idx);
 	});
 }
 
