@@ -8,7 +8,7 @@
 #include <thread>
 
 struct BMasterTarget {
-	BMasterTarget(asio::io_service& io_service, asio::ip::tcp::resolver::iterator& it, BListItemGroup* group)
+	BMasterTarget(asio::io_service& io_service, asio::ip::tcp::resolver::iterator&& it, BListItemGroup* group)
 		: m_socket(io_service),
 		m_epIterator(it),
 		m_blistGroup(group) {

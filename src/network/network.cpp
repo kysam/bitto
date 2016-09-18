@@ -30,11 +30,8 @@ void BNetwork::Init(BList *blist) {
 	asio::ip::tcp::resolver resolver(m_io_service);
 	for (int i = 0; i < groups.size(); i++) {
 		for (int ii = 0; ii < groups[i].items.size(); ii++) {
-			char port[10];
-
-			itoa(groups[i].port, port, 10);
-			m_masterTargets.push_back(BMasterTarget(m_io_service, 
-				std::move(resolver.resolve({groups[i].addr, port})), &groups[i]));
+			asio::ip::tcp::resolver::iterator it = resolver.resolve({ groups[i].addr, std::to_string(groups[i].port) });
+			m_masterTargets.push_back(BMasterTarget(m_io_service, std::move(it), &groups[i]));
 		}
 	}
 
