@@ -29,10 +29,9 @@ void BNetwork::Init(BList *blist) {
 
 	asio::ip::tcp::resolver resolver(m_io_service);
 	for (int i = 0; i < groups.size(); i++) {
-		for (int ii = 0; ii < groups[i].items.size(); ii++) {
 			asio::ip::tcp::resolver::iterator it = resolver.resolve({ groups[i].addr, std::to_string(groups[i].port) });
+			log_network("target %s:%d", groups[i].addr, groups[i].port);
 			m_masterTargets.push_back(BMasterTarget(m_io_service, std::move(it), &groups[i]));
-		}
 	}
 
 	m_targetConnected = new bool[m_masterTargets.size()];
