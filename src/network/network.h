@@ -41,7 +41,6 @@ public:
 	float* m_targetElapsed;
 	std::thread* m_connThread;
 	std::thread* m_ioThread;
-
 	BList *m_blist;
 
 	static BNetwork* Get();

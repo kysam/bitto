@@ -51,7 +51,6 @@ void BNetwork::Run(const char* name, short port) {
 	});
 	Listen(name, port);
 	Connect();
-
 }
 
 void BNetwork::Listen(const char* name, short port) {
@@ -78,8 +77,8 @@ void BNetwork::Connect() {
 
 				m_targetElapsed[i] = clock() / 1000.0f;
 				log_network("connecting to %s", m_masterTargets[i].m_epIterator->host_name().c_str());
-
 				m_targetConnectState[i] = kConnecting;
+
 				asio::async_connect(m_masterTargets[i].m_socket, m_masterTargets[i].m_epIterator,
 					[this, i](std::error_code ec, asio::ip::tcp::resolver::iterator) {
 					if (!ec) {
@@ -92,6 +91,8 @@ void BNetwork::Connect() {
 						m_targetConnectState[i] = kConnected;
 						return;
 					}
+
+					m_targetConnectState[i] = kNotConnected;
 					log_network("connect to %s failed, trying again...", m_masterTargets[i].m_epIterator->host_name().c_str());
 				});
 			}
