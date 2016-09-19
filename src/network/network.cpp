@@ -45,7 +45,7 @@ void BNetwork::Init(BList *blist) {
 void BNetwork::Run(const char* name, short port) {
 	m_ioThread = new std::thread([this] {
 		while (true) {
-			Sleep(10);
+			SleepFor(10);
 			m_io_service.run();
 		}
 	});
