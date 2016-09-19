@@ -66,10 +66,12 @@ struct BPOp {
 
 	void ClearPackets() {
 		std::vector<BPacket>().swap(m_packets);
+		m_cPacketSent = 0;
 	}
 
 	BSession *m_session;
 	std::vector<BPacket> m_packets;
+	int m_cPacketSent;	//number of packets in m_packets sent
 	ProtocolCode m_code;
 
 	virtual void Process() = 0;
@@ -103,7 +105,6 @@ struct BPOp_request_checksums : BPOp {
 
 	std::vector<int> m_checksums;
 	std::vector<ChecksumGroup> m_checksumGroups;
-	int m_cPacketSent;	//number of packets in m_packets sent
 
 	void Process() {
 		if (m_session->m_type == BSession::kMaster) {
@@ -171,6 +172,5 @@ struct BPOp_request_checksums : BPOp {
 		});
 	}
 };
-
 
 #endif
