@@ -15,5 +15,6 @@
 #define ASIO_HAS_MOVE
 #include "../asio.hpp"
 
-#define Cast2Var(raw, type) *reinterpret_cast<type*>(raw)
+#define Cast2Value(raw, type) *reinterpret_cast<type*>(raw)	//get value of a type from pointer
+#define Cast2Pointer(raw, type) reinterpret_cast<type>(raw)
 #define SleepFor(mili)	std::this_thread::sleep_for(std::chrono::milliseconds(mili))

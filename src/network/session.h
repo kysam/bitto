@@ -36,6 +36,7 @@ public:
 	void StartMaster();
 	void Terminate();
 	void Receive();
+	void NewOperation(BPOp * op);
 };
 
 typedef std::shared_ptr<BSession> _ptrSession;

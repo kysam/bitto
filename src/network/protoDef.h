@@ -33,13 +33,28 @@ struct BPHeader {
 	ProtocolCode m_code;
 
 	void Get(unsigned char *raw) {
-		m_magic = Cast2Var(raw, unsigned short);
+		m_magic = Cast2Value(raw, unsigned short);
 		raw += sizeof(unsigned short);
-		m_size = Cast2Var(raw, unsigned short);
+		m_size = Cast2Value(raw, unsigned short);
 		raw += sizeof(unsigned short);
-		m_code = Cast2Var(raw, ProtocolCode);
+		m_code = Cast2Value(raw, ProtocolCode);
 	}
 
+};
+
+struct BPacket : BLimitBuffer {
+	BPacket(ProtocolCode code) : BLimitBuffer(MAX_PACKET_SIZE) {
+		BPHeader header(code, 0);
+		Append(&header, sizeof(BPHeader));
+	}
+
+	void Pack() {
+		GetHeader()->m_size = m_size;
+	}
+
+	BPHeader *GetHeader() {
+		return Cast2Pointer(m_raw, BPHeader*);
+	}
 };
 
 /*========================packet operations========================*/
@@ -49,8 +64,14 @@ struct BPOp {
 		m_session = session;
 	}
 
+	void ClearPackets() {
+		std::vector<BPacket>().swap(m_packets);
+	}
+
 	BSession *m_session;
+	std::vector<BPacket> m_packets;
 	ProtocolCode m_code;
+
 	virtual void Process() = 0;
 };
 
@@ -79,21 +100,31 @@ struct BPOp_request_checksums : BPOp {
 	~BPOp_request_checksums() {
 	}
 	
+
 	std::vector<int> m_checksums;
-	std::vector<BLimitBuffer> m_packets;
 	std::vector<ChecksumGroup> m_checksumGroups;
 	int m_cPacketSent;	//number of packets in m_packets sent
 
 	void Process() {
-		unsigned char *packet = m_session->m_dataBuffer.m_raw;
-		BPHeader *header = Cast2Var(packet, BPHeader*);
-		log_protocol("processing code %d", header->m_code);
-	}
+		if (m_session->m_type == BSession::kMaster) {
+			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
+			log_protocol("(master) received request");
 
+			m_packets.push_back(BPacket(request_checksums_answer));
+			BPacket *packet = &m_packets.back();
+			packet->Pack();
+			Send();
+		}
+		else if (m_session->m_type == BSession::kSlave) {
+			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
+			log_protocol("(slave) received answer for request");
+		}
+	}
+		
 	void MapFrom(unsigned char *raw) {	//read the request answer packet
 		for (int i = 0; i < m_checksumGroups.size(); i++) {
 			for (int ii = 0; ii < m_checksumGroups[i].m_files.size(); ii++) {
-				m_checksumGroups[i].m_files[ii].checksum = Cast2Var(raw, int);
+				m_checksumGroups[i].m_files[ii].checksum = Cast2Value(raw, int);
 				raw += sizeof(int);
 			}
 		}
@@ -101,18 +132,14 @@ struct BPOp_request_checksums : BPOp {
 
 	void Build() {	//build the request packet
 		//set header for packet
-		BPHeader header(request_checksums, 0);
-		m_packets.push_back(BLimitBuffer(MAX_PACKET_SIZE));
-		BLimitBuffer *packet = &m_packets.back();
-		packet->Append(&header, sizeof(header));
+		m_packets.push_back(BPacket(request_checksums));
+		BPacket *packet = &m_packets.back();
 
 		//append checksum groups and files
 		for (int i = 0; i < m_checksumGroups.size(); i++) {
 			if (packet->m_overflowed) {
-				//modify current packet's header
-				BPHeader *header = Cast2Var(packet->m_raw, BPHeader*);
-				header->m_size = packet->m_size;
-				m_packets.push_back(BLimitBuffer(MAX_PACKET_SIZE));
+				packet->Pack();
+				m_packets.push_back(BPacket(request_checksums));
 				packet = &m_packets.back();
 			}
 
@@ -137,9 +164,13 @@ struct BPOp_request_checksums : BPOp {
 			if (m_cPacketSent < m_packets.size() - 1) {
 				Send();
 				m_cPacketSent++;
+				return;
 			}
+
+			ClearPackets();	//clear after every packet has been sent
 		});
 	}
 };
+
 
 #endif

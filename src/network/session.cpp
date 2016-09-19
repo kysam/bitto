@@ -23,8 +23,8 @@ void BSession::Start() {
 }
 
 void BSession::StartSlave() {
-	BPOp_request_checksums *op = new BPOp_request_checksums(this);
-	m_currentOp = op;
+	NewOperation(new BPOp_request_checksums(this));
+	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
 
 	for (int i = 0; i < m_blistGroup->items.size(); i++) {
 		BPOp_request_checksums::ChecksumGroup group;
@@ -38,6 +38,9 @@ void BSession::StartSlave() {
 }
 
 void BSession::StartMaster() {
+	NewOperation(new BPOp_request_checksums(this));
+	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
+
 	Receive();
 }
 
@@ -59,5 +62,12 @@ void BSession::Receive() {
 			Receive();
 		}
 	});
+}
+
+void BSession::NewOperation(BPOp *op) {
+	if (m_currentOp)
+		delete m_currentOp;
+
+	m_currentOp = op;
 }
 
