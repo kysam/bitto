@@ -76,6 +76,7 @@ void BNetwork::Connect() {
 				m_targetElapsed[i] = clock() / 1000.0f;
 				log_network("connecting to %s", m_masterTargets[i].m_epIterator->host_name().c_str());
 
+				m_targetConnectState[i] = kConnecting;
 				asio::async_connect(m_masterTargets[i].m_socket, m_masterTargets[i].m_epIterator,
 					[this, i](std::error_code ec, asio::ip::tcp::resolver::iterator) {
 					if (!ec) {
