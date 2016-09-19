@@ -44,11 +44,14 @@ void BNetwork::Init(BList *blist) {
 
 void BNetwork::Run(const char* name, short port) {
 	m_ioThread = new std::thread([this] {
-		m_io_service.run();
+		while (true) {
+			Sleep(10);
+			m_io_service.run();
+		}
 	});
-
 	Listen(name, port);
 	Connect();
+
 }
 
 void BNetwork::Listen(const char* name, short port) {
@@ -89,7 +92,7 @@ void BNetwork::Connect() {
 						m_targetConnectState[i] = kConnected;
 						return;
 					}
-					log_network("connect to failed, trying again...", m_masterTargets[i].m_epIterator->host_name().c_str());
+					log_network("connect to %s failed, trying again...", m_masterTargets[i].m_epIterator->host_name().c_str());
 				});
 			}
 		}
