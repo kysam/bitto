@@ -34,10 +34,10 @@ void BNetwork::Init(BList *blist) {
 			m_masterTargets.push_back(BMasterTarget(m_io_service, std::move(it), &groups[i]));
 	}
 
-	m_targetConnected = new bool[m_masterTargets.size()];
+	m_targetConnectState = new ConnectState[m_masterTargets.size()];
 	m_targetElapsed = new float[m_masterTargets.size()];
 	for (int i = 0; i < m_masterTargets.size(); i++) {
-		m_targetConnected[i] = false;
+		m_targetConnectState[i] = kNotConnected;
 		m_targetElapsed[i] = clock() / 1000.0f;
 	}
 }
@@ -68,7 +68,7 @@ void BNetwork::Connect() {
 		while (true) {
 			SleepFor(200);
 			for (int i = 0; i < m_masterTargets.size(); i++) {
-				if (m_targetConnected[i])
+				if (m_targetConnectState[i] == kConnecting || m_targetConnectState[i] == kConnected)
 					continue;
 				if (((clock() / 1000.0f) - m_targetElapsed[i]) < 0.5f)
 					continue;
@@ -85,7 +85,7 @@ void BNetwork::Connect() {
 
 						session->m_blistGroup = m_masterTargets[i].m_blistGroup;
 						session->Start();
-						m_targetConnected[i] = true;
+						m_targetConnectState[i] = kConnected;
 						return;
 					}
 					log_network("connect to failed, trying again...", m_masterTargets[i].m_epIterator->host_name().c_str());

@@ -24,6 +24,12 @@ public:
 	BNetwork();
 	~BNetwork();
 
+	enum ConnectState {
+		kConnected,
+		kConnecting,
+		kNotConnected
+	};
+
 
 	static BNetwork* m_singleton;
 	static asio::io_service m_io_service;
@@ -31,7 +37,7 @@ public:
 	std::vector<_ptrSession> m_sessions;
 	asio::ip::tcp::socket m_accSocket;
 	std::vector<BMasterTarget> m_masterTargets;
-	bool* m_targetConnected;
+	ConnectState* m_targetConnectState;
 	float* m_targetElapsed;
 	std::thread* m_connThread;
 	std::thread* m_ioThread;
