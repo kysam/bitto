@@ -21,6 +21,7 @@ public:
 	void AdvancePos(int len);
 	int GetWPos() { return m_wPos; };
 	int GetAvailable();
+	void Clear();
 };
 
 #endif

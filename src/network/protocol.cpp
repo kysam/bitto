@@ -55,5 +55,8 @@ void BProtocol::Process(BSession *session) {
 
 		if (session->m_currentOp)
 			session->m_currentOp->Process();	//process current operation
+
+		targetHeader->m_size = -1;
+		buffer.Reset();
 	}
 }

@@ -102,7 +102,6 @@ struct BPOp_request_checksums : BPOp {
 	~BPOp_request_checksums() {
 	}
 	
-
 	std::vector<int> m_checksums;
 	std::vector<ChecksumGroup> m_checksumGroups;
 

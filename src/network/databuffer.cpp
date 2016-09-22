@@ -13,3 +13,7 @@ void BDataBuffer::AdvancePos(int len) {
 int BDataBuffer::GetAvailable() {
 	return (m_maxSize - m_wPos);
 }
+
+void BDataBuffer::Reset() {
+	m_wPos = 0;
+}
