@@ -25,7 +25,7 @@ void BProtocol::Process(BSession *session) {
 	BDataBuffer& buffer = session->m_dataBuffer;
 	BPHeader *targetHeader = session->m_targetHeader;
 
-	if (targetHeader->m_size == -1) {;
+	if (targetHeader->m_size == -1) {
 		auto raw = buffer.m_raw;
 		targetHeader->Get(raw);
 
