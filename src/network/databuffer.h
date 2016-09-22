@@ -7,6 +7,7 @@ public:
 	BDataBuffer(int max) {
 		m_raw = new unsigned char[max];
 		m_maxSize = max;
+		m_wPos = 0;
 	};
 	~BDataBuffer() {
 		delete[] m_raw;
