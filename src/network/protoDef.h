@@ -137,7 +137,16 @@ struct BPOp_request_checksums : BPOp {
 
 		//append checksum groups and files
 		for (int i = 0; i < m_checksumGroups.size(); i++) {
-			if (packet->m_overflowed) {
+			int bodySize = 0;
+			
+			bodySize += sizeof(ElementCode);
+			bodySize += strlen(m_checksumGroups[i].path);
+			for (int ii = 0; ii < m_checksumGroups[i].m_files.size(); ii++) {
+				bodySize += sizeof(ElementCode);
+				bodySize += strlen(m_checksumGroups[i].m_files[ii].fileName);
+			}
+
+			if (bodySize + sizeof(BPHeader) > MAX_PACKET_SIZE) {
 				packet->Pack();
 				m_packets.push_back(BPacket(request_checksums));
 				packet = &m_packets.back();
