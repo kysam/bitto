@@ -168,6 +168,7 @@ struct BPOp_request_checksums : BPOp {
 				return;
 			}
 
+			log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
 			ClearPackets();	//clear after every packet has been sent
 		});
 	}
