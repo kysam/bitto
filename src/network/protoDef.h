@@ -65,12 +65,13 @@ struct BPOp {
 	}
 
 	void ClearPackets() {
-		std::vector<BPacket>().swap(m_packets);
+		for (BPacket *it : m_packets)
+			delete it;
 		m_cPacketSent = 0;
 	}
 
 	BSession *m_session;
-	std::vector<BPacket> m_packets;
+	std::vector<BPacket*> m_packets;
 	int m_cPacketSent;	//number of packets in m_packets sent
 	ProtocolCode m_code;
 
@@ -110,8 +111,8 @@ struct BPOp_request_checksums : BPOp {
 			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
 			log_protocol("(master) received request");
 
-			m_packets.push_back(BPacket(request_checksums_answer));
-			BPacket *packet = &m_packets.back();
+			m_packets.push_back(new BPacket(request_checksums_answer));
+			BPacket *packet = m_packets.back();
 			packet->Pack();
 			Send();
 		}
@@ -132,8 +133,8 @@ struct BPOp_request_checksums : BPOp {
 
 	void Build() {	//build the request packet
 		//set header for packet
-		m_packets.push_back(BPacket(request_checksums));
-		BPacket *packet = &m_packets.back();
+		m_packets.push_back(new BPacket(request_checksums));
+		BPacket *packet = m_packets.back();
 
 		//append checksum groups and files
 		for (int i = 0; i < m_checksumGroups.size(); i++) {
@@ -148,8 +149,8 @@ struct BPOp_request_checksums : BPOp {
 
 			if (bodySize + sizeof(BPHeader) > MAX_PACKET_SIZE) {
 				packet->Pack();
-				m_packets.push_back(BPacket(request_checksums));
-				packet = &m_packets.back();
+				m_packets.push_back(new BPacket(request_checksums));
+				packet = m_packets.back();
 			}
 
 			packet->AppendK<ElementCode>(checksum_group);
@@ -161,11 +162,11 @@ struct BPOp_request_checksums : BPOp {
 			}
 		}
 
-		log_session("packet built header size %d", m_packets[0].GetHeader()->m_size);
+		log_session("packet built header size %d", m_packets[0]->GetHeader()->m_size);
 	};
 
 	void Send() {
-		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent].m_raw, m_packets[m_cPacketSent].m_size),
+		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent]->m_raw, m_packets[m_cPacketSent]->m_size),
 			[this](std::error_code ec, std::size_t cTransferred) {
 			if (ec) {
 				log_session("write error (code %d)", ec);
@@ -179,7 +180,7 @@ struct BPOp_request_checksums : BPOp {
 				return;
 			}
 
-			log_protocol("Sent %d packets, %d bytes, last header size %d", m_cPacketSent, cTransferred, m_packets[m_cPacketSent].GetHeader()->m_size);
+			log_protocol("Sent %d packets, %d bytes, last header size %d", m_cPacketSent, cTransferred, m_packets[m_cPacketSent]->GetHeader()->m_size);
 			ClearPackets();	//clear after every packet has been sent
 		});
 	}
