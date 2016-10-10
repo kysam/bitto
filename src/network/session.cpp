@@ -54,7 +54,7 @@ void BSession::Receive() {
 	m_socket.async_read_some(asio::buffer(m_dataBuffer.GetIn(), m_dataBuffer.GetAvailable()), 
 		[this](std::error_code ec, std::size_t cTransferred) {
 		if (!ec) {
-			log_session("%s recvd %d bytes of data", cTransferred, m_type == kMaster ? "Master" : "Slave");
+			log_session("%s recvd %d bytes of data", m_type == kMaster ? "Master" : "Slave", cTransferred);
 			if (cTransferred > 0) {
 				m_dataBuffer.AdvancePos(cTransferred);
 				BProtocol::Get()->Process(this);
