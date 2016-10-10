@@ -160,6 +160,8 @@ struct BPOp_request_checksums : BPOp {
 				packet->Append(m_checksumGroups[i].m_files[ii].fileName, strlen(m_checksumGroups[i].m_files[ii].fileName));
 			}
 		}
+
+		log_session("packet built header size %d", m_packets[0].GetHeader()->m_size);
 	};
 
 	void Send() {
