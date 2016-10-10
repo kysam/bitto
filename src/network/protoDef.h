@@ -164,6 +164,7 @@ struct BPOp_request_checksums : BPOp {
 			if (m_cPacketSent < m_packets.size() - 1) {
 				Send();
 				m_cPacketSent++;
+				log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
 				return;
 			}
 
