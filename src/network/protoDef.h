@@ -6,7 +6,7 @@
 #define PACKET_HEADER_MAGIC	0x2181
 #define MAX_PATH_LEN	260
 #define MAX_FILE_NAME	260
-#define	IsCodeValid(what, code)	(code >= what ## _end) ? true : false
+#define	IsCodeValid(what, code)	(code < what ## _end) ? true : false
 
 #include "../common/common.h"
 #include "../common/utils.h"
@@ -44,7 +44,7 @@ struct BPHeader {
 	}
 
 	bool IsValid() {
-		return (m_code < ProtocolCode_end);
+		return IsCodeValid(ProtocolCode, m_code);
 	}
 
 };

@@ -8,7 +8,7 @@ BSession::BSession(asio::ip::tcp::socket socket) : m_socket(std::move(socket)),
 													m_blist(nullptr),
 													m_blistGroup(nullptr),
 													m_currentOp(nullptr) {
-	m_targetHeader = new BPHeader(ProtocolCode_end, -1);
+	m_targetHeader = new BPHeader(ProtocolCode_end, 0);
 }
 
 BSession::~BSession() {
