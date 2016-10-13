@@ -53,6 +53,7 @@ struct BPacket : BLimitBuffer {
 	BPacket(ProtocolCode code) : BLimitBuffer(MAX_PACKET_SIZE) {
 		BPHeader header(code, 1);
 		Append(&header, sizeof(BPHeader));
+		m_size += sizeof(BPHeader);
 	}
 
 	void Pack() {
