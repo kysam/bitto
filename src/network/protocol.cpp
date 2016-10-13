@@ -24,12 +24,12 @@ BProtocol* BProtocol::Get() {
 void BProtocol::Process(BSession *session) {
 	BDataBuffer& buffer = session->m_dataBuffer;
 	BPHeader *targetHeader = session->m_targetHeader;
-	printf("process\n");
+	log_protocol("process\n");
 
 
 	if (targetHeader->m_size == -1) {
 		targetHeader->MapFrom(buffer.m_raw);
-		printf("1. %d %d", targetHeader->m_size, buffer.m_wPos);
+		log_protocol("1. %d %d", targetHeader->m_size, buffer.m_wPos);
 
 		if (targetHeader->m_magic != PACKET_HEADER_MAGIC) {
 			log_protocol("wrong header magic");
@@ -42,7 +42,7 @@ void BProtocol::Process(BSession *session) {
 		}
 	}
 
-	printf("2. %d %d", targetHeader->m_size, buffer.m_wPos);
+	log_protocol("2. %d %d", targetHeader->m_size, buffer.m_wPos);
 	if (targetHeader->m_size == buffer.m_wPos) {	//expected packet has come in full
 		if (!IsCodeValid(ProtocolCode, session->m_targetHeader->m_code)) {
 			log_protocol("unknown protocol code, terminating session");
