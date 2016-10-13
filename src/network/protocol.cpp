@@ -24,6 +24,7 @@ BProtocol* BProtocol::Get() {
 void BProtocol::Process(BSession *session) {
 	BDataBuffer& buffer = session->m_dataBuffer;
 	BPHeader *targetHeader = session->m_targetHeader;
+	printf("process\n");
 
 
 	if (targetHeader->m_size == -1) {
