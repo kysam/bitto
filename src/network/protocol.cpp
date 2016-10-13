@@ -25,7 +25,6 @@ void BProtocol::Process(BSession *session) {
 	BDataBuffer& buffer = session->m_dataBuffer;
 	BPHeader *targetHeader = session->m_targetHeader;
 
-	printf("protocol process\n");
 
 	if (targetHeader->m_size == -1) {
 		auto raw = buffer.m_raw;
@@ -41,6 +40,9 @@ void BProtocol::Process(BSession *session) {
 			return;
 		}
 	}
+
+	printf("protocol process %d %d\n", targetHeader->m_size, buffer.m_wPos);
+
 
 	if (targetHeader->m_size == buffer.m_wPos) {	//expected packet has come in full
 		if (!IsCodeValid(ProtocolCode, session->m_targetHeader->m_code)) {
