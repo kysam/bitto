@@ -32,12 +32,11 @@ struct BPHeader {
 	unsigned short m_size;
 	ProtocolCode m_code;
 
-	void Get(unsigned char *raw) {
-		m_magic = Cast2Value(raw, unsigned short);
-		raw += sizeof(unsigned short);
-		m_size = Cast2Value(raw, unsigned short);
-		raw += sizeof(unsigned short);
-		m_code = Cast2Value(raw, ProtocolCode);
+	void MapFrom(unsigned char *raw) {
+		BPHeader *map = reinterpret_cast<BPHeader*>(raw);
+		m_magic = map->m_magic;
+		m_size = map->m_size;
+		m_code = map->m_code;
 	}
 
 };

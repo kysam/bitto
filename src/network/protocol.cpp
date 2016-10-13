@@ -27,8 +27,7 @@ void BProtocol::Process(BSession *session) {
 
 
 	if (targetHeader->m_size == -1) {
-		auto raw = buffer.m_raw;
-		targetHeader->Get(raw);
+		targetHeader->MapFrom(buffer.m_raw);
 
 		if (targetHeader->m_magic != PACKET_HEADER_MAGIC) {
 			log_protocol("wrong header magic");
@@ -40,10 +39,6 @@ void BProtocol::Process(BSession *session) {
 			return;
 		}
 	}
-
-	BPHeader *rawHeader = (BPHeader*)buffer.m_raw;
-	printf("protocol process %d %d\n", rawHeader->m_size, buffer.m_wPos);
-
 
 	if (targetHeader->m_size == buffer.m_wPos) {	//expected packet has come in full
 		if (!IsCodeValid(ProtocolCode, session->m_targetHeader->m_code)) {
