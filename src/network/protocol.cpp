@@ -25,6 +25,8 @@ void BProtocol::Process(BSession *session) {
 	BDataBuffer& buffer = session->m_dataBuffer;
 	BPHeader *targetHeader = session->m_targetHeader;
 
+	printf("protocol process\n");
+
 	if (targetHeader->m_size == -1) {
 		auto raw = buffer.m_raw;
 		targetHeader->Get(raw);
@@ -52,6 +54,9 @@ void BProtocol::Process(BSession *session) {
 			session->Terminate();
 			return;
 		}
+
+		printf("protocol process 2\n");
+
 
 		if (session->m_currentOp)
 			session->m_currentOp->Process();	//process current operation
