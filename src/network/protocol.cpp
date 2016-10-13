@@ -41,7 +41,8 @@ void BProtocol::Process(BSession *session) {
 		}
 	}
 
-	printf("protocol process %d %d\n", targetHeader->m_size, buffer.m_wPos);
+	BPHeader *rawHeader = (BPHeader*)buffer.m_raw;
+	printf("protocol process %d %d\n", rawHeader->m_size, buffer.m_wPos);
 
 
 	if (targetHeader->m_size == buffer.m_wPos) {	//expected packet has come in full
