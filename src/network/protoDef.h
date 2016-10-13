@@ -39,6 +39,14 @@ struct BPHeader {
 		m_code = map->m_code;
 	}
 
+	void SetInvalid() {
+		m_code = ProtocolCode_end;
+	}
+
+	bool IsValid() {
+		return (m_code < ProtocolCode_end);
+	}
+
 };
 
 struct BPacket : BLimitBuffer {
