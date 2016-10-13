@@ -44,7 +44,7 @@ struct BPHeader {
 
 struct BPacket : BLimitBuffer {
 	BPacket(ProtocolCode code) : BLimitBuffer(MAX_PACKET_SIZE) {
-		BPHeader header(code, 0);
+		BPHeader header(code, 1);
 		Append(&header, sizeof(BPHeader));
 	}
 
@@ -110,8 +110,8 @@ struct BPOp_request_checksums : BPOp {
 		if (m_session->m_type == BSession::kMaster) {
 			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
 			log_protocol("(master) received request");
-
 			m_packets.push_back(new BPacket(request_checksums_answer));
+
 			BPacket *packet = m_packets.back();
 			packet->Pack();
 			Send();
@@ -142,6 +142,7 @@ struct BPOp_request_checksums : BPOp {
 			
 			bodySize += sizeof(ElementCode);
 			bodySize += strlen(m_checksumGroups[i].path);
+
 			for (int ii = 0; ii < m_checksumGroups[i].m_files.size(); ii++) {
 				bodySize += sizeof(ElementCode);
 				bodySize += strlen(m_checksumGroups[i].m_files[ii].fileName);
@@ -162,7 +163,7 @@ struct BPOp_request_checksums : BPOp {
 			}
 		}
 
-		log_session("packet built header size %d", m_packets[0]->GetHeader()->m_size);
+		packet->Pack();	//pack last packet
 	};
 
 	void Send() {
@@ -180,7 +181,6 @@ struct BPOp_request_checksums : BPOp {
 				return;
 			}
 
-			log_protocol("Sent %d packets, %d bytes, last header size %d", m_cPacketSent, cTransferred, m_packets[m_cPacketSent]->GetHeader()->m_size);
 			ClearPackets();	//clear after every packet has been sent
 		});
 	}
