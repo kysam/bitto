@@ -191,7 +191,7 @@ struct BPOp_request_checksums : BPOp {
 				return;
 			}
 
-			ClearPackets();	//clear after every packet has been sent
+		//	ClearPackets();	//clear after every packet has been sent
 		});
 	}
 };
