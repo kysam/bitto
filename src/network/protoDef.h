@@ -53,7 +53,6 @@ struct BPacket : BLimitBuffer {
 	BPacket(ProtocolCode code) : BLimitBuffer(MAX_PACKET_SIZE) {
 		BPHeader header(code, 1);
 		Append(&header, sizeof(BPHeader));
-		m_size += sizeof(BPHeader);
 	}
 
 	void Pack() {
@@ -175,16 +174,19 @@ struct BPOp_request_checksums : BPOp {
 	};
 
 	void Send() {
+		int packetSend = m_cPacketSent;
 		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent]->m_raw, m_packets[m_cPacketSent]->m_size),
-			[this](std::error_code ec, std::size_t cTransferred) {
+			[this, packetSend](std::error_code ec, std::size_t cTransferred) {
 			if (ec) {
 				log_session("write error (code %d)", ec);
+				log_session("Packet sent %d", packetSend);
+				log_session("Packet sent size %d", m_packets[m_cPacketSent]->m_size);
 				m_session->Terminate();
 			}
 
-			if (m_cPacketSent < m_packets.size() - 1) {
+			m_cPacketSent++;
+			if (m_cPacketSent < m_packets.size()) {
 				Send();
-				m_cPacketSent++;
 				log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
 				return;
 			}
