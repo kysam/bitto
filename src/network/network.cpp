@@ -10,10 +10,7 @@ BNetwork::BNetwork() : m_acceptor(m_io_service),
 }
 
 BNetwork::~BNetwork() {
-	m_connThread->join();
-	m_ioThread->join();
-	delete m_connThread;
-	delete m_ioThread;
+	Stop();
 }
 
 BNetwork* BNetwork::Get() {
@@ -49,8 +46,16 @@ void BNetwork::Run(const char* name, short port) {
 			m_io_service.run();
 		}
 	});
-	Listen(name, port);
+
 	Connect();
+	Listen(name, port);
+}
+
+void BNetwork::Stop() {
+	m_connThread->join();
+	m_ioThread->join();
+	delete m_connThread;
+	delete m_ioThread;
 }
 
 void BNetwork::Listen(const char* name, short port) {
@@ -110,6 +115,9 @@ void BNetwork::Accept() {
 			session->m_type = BSession::kMaster;
 			session->Start();
 			Accept();
+		}
+		else {
+			log_network("listen error (code %d)", ec);
 		}
 	});
 }

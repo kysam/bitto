@@ -46,6 +46,7 @@ public:
 	static BNetwork* Get();
 	void Init(BList *blist);
 	void Run(const char* name, short port);
+	void Stop();
 	void Listen(const char* ip, short port);
 	void Connect();
 	void Accept();
