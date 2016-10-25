@@ -106,11 +106,10 @@ void BNetwork::Connect() {
 }
 
 void BNetwork::Accept() {
-	asio_socket *socket = new asio_socket(m_io_service);
-	m_acceptor.async_accept(*socket,
-		[this, socket](std::error_code ec) {
+	m_acceptor.async_accept(m_accSocket,
+		[this](std::error_code ec) {
 		if (!ec) {
-			_ptrSession session = std::make_shared<BSession>(std::move(*socket));
+			_ptrSession session = std::make_shared<BSession>(std::move(m_accSocket));
 			m_sessions.push_back(session);
 
 			session->m_type = BSession::kMaster;
@@ -118,7 +117,7 @@ void BNetwork::Accept() {
 			Accept();
 		}
 		else {
-			log_network("listen error (code %d)", ec);
+			log_network("accept error (code %d)", ec);
 		}
 	});
 }
