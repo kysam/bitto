@@ -85,13 +85,13 @@ struct BPOp {
 	virtual void Process() = 0;
 	void Send() {
 		int packetSend = m_cPacketSent;
-		m_session->m_socket.async_write_some(asio::buffer(m_packets[m_cPacketSent]->m_raw, m_packets[m_cPacketSent]->m_size),
+		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent]->m_raw, m_packets[m_cPacketSent]->m_size),
 			[this, packetSend](std::error_code ec, std::size_t cTransferred) {
 			if (ec) {
 				log_session("write error (code %d)", ec);
 				log_session("Packet sent %d", packetSend);
 				log_session("Packet sent size %d", m_packets[m_cPacketSent]->m_size);
-				m_session->Terminate();
+			//	m_session->Terminate();
 			}
 
 			m_cPacketSent++;
