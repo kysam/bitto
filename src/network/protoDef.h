@@ -97,10 +97,10 @@ struct BPOp {
 			m_cPacketSent++;
 			if (m_cPacketSent < m_packets.size()) {
 				Send();
-				log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
+				
 				return;
 			}
-
+			log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
 			ClearPackets();	//clear after every packet has been sent
 		});
 	}

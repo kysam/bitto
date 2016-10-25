@@ -23,6 +23,7 @@ void BSession::Start() {
 }
 
 void BSession::StartSlave() {
+	Receive();
 	NewOperation(new BPOp_request_checksums(this));
 	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
 
@@ -34,7 +35,6 @@ void BSession::StartSlave() {
 
 	op->Build();
 	op->Send();
-	Receive();
 }
 
 void BSession::StartMaster() {
