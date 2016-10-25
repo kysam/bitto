@@ -14,7 +14,7 @@ struct BMasterTarget {
 		m_blistGroup(group) {
 	};
 
-	asio::ip::tcp::socket m_socket;
+	asio_socket m_socket;
 	asio::ip::tcp::resolver::iterator m_epIterator;
 	BListItemGroup *m_blistGroup;
 };
@@ -33,9 +33,9 @@ public:
 
 	static BNetwork* m_singleton;
 	static asio::io_service m_io_service;
-	asio::ip::tcp::acceptor m_acceptor;
+	asio_acceptor m_acceptor;
 	std::vector<_ptrSession> m_sessions;
-	asio::ip::tcp::socket m_accSocket;
+	asio_socket m_accSocket;
 	std::vector<BMasterTarget> m_masterTargets;
 	ConnectState* m_targetConnectState;
 	float* m_targetElapsed;

@@ -2,7 +2,7 @@
 #include "protocol.h"
 #include "protoDef.h"
 
-BSession::BSession(asio::ip::tcp::socket socket) : m_socket(std::move(socket)),
+BSession::BSession(asio_socket socket) : m_socket(std::move(socket)),
 													m_dataBuffer(MAX_PACKET_SIZE),
 													m_state(kIdle),
 													m_blist(nullptr),

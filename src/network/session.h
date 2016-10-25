@@ -10,7 +10,7 @@ struct BPOp;
 class BSession
 {
 public:
-	BSession(asio::ip::tcp::socket socket);
+	BSession(asio_socket socket);
 	~BSession();
 
 	enum SessionType {
@@ -25,7 +25,7 @@ public:
 	BDataBuffer m_dataBuffer;
 	SessionType m_type;
 	State m_state;
-	asio::ip::tcp::socket m_socket;
+	asio_socket m_socket;
 	BPHeader *m_targetHeader;	//current header to account incoming data for
 	BPOp *m_currentOp;
 	BList *m_blist;

@@ -11,9 +11,8 @@
 #include <Winsock2.h>
 #endif
 
-#define ASIO_STANDALONE
-#define ASIO_HAS_MOVE
-#include "../asio.hpp"
+#include "asio.h"
+#include "types.h"
 
 #define Cast2Value(raw, type) *reinterpret_cast<type*>(raw)	//get value of a type from pointer
 #define Cast2Pointer(raw, type) reinterpret_cast<type>(raw)

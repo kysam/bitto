@@ -63,7 +63,7 @@ void BNetwork::Listen(const char* name, short port) {
 	asio::ip::tcp::endpoint endpoint = *resolver.resolve({std::string(name), std::to_string(port)});
 	m_acceptor.open(endpoint.protocol());
 
-	m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+	m_acceptor.set_option(asio_acceptor::reuse_address(true));
 	m_acceptor.bind(endpoint);
 	m_acceptor.listen();
 
@@ -106,10 +106,11 @@ void BNetwork::Connect() {
 }
 
 void BNetwork::Accept() {
-	m_acceptor.async_accept(m_accSocket,
-		[this](std::error_code ec) {
+	asio_socket *socket = new asio_socket(m_io_service);
+	m_acceptor.async_accept(*socket,
+		[this, socket](std::error_code ec) {
 		if (!ec) {
-			_ptrSession session = std::make_shared<BSession>(std::move(m_accSocket));
+			_ptrSession session = std::make_shared<BSession>(std::move(*socket));
 			m_sessions.push_back(session);
 
 			session->m_type = BSession::kMaster;
