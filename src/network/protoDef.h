@@ -83,6 +83,27 @@ struct BPOp {
 	ProtocolCode m_code;
 
 	virtual void Process() = 0;
+	void Send() {
+		int packetSend = m_cPacketSent;
+		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent]->m_raw, m_packets[m_cPacketSent]->m_size),
+			[this, packetSend](std::error_code ec, std::size_t cTransferred) {
+			if (ec) {
+				log_session("write error (code %d)", ec);
+				log_session("Packet sent %d", packetSend);
+				log_session("Packet sent size %d", m_packets[m_cPacketSent]->m_size);
+				m_session->Terminate();
+			}
+
+			m_cPacketSent++;
+			if (m_cPacketSent < m_packets.size()) {
+				Send();
+				log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
+				return;
+			}
+
+			ClearPackets();	//clear after every packet has been sent
+		});
+	}
 };
 
 struct BPOp_request_checksums : BPOp {
@@ -172,28 +193,6 @@ struct BPOp_request_checksums : BPOp {
 
 		packet->Pack();	//pack last packet
 	};
-
-	void Send() {
-		int packetSend = m_cPacketSent;
-		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent]->m_raw, m_packets[m_cPacketSent]->m_size),
-			[this, packetSend](std::error_code ec, std::size_t cTransferred) {
-			if (ec) {
-				log_session("write error (code %d)", ec);
-				log_session("Packet sent %d", packetSend);
-				log_session("Packet sent size %d", m_packets[m_cPacketSent]->m_size);
-				m_session->Terminate();
-			}
-
-			m_cPacketSent++;
-			if (m_cPacketSent < m_packets.size()) {
-				Send();
-				log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
-				return;
-			}
-
-		//	ClearPackets();	//clear after every packet has been sent
-		});
-	}
 };
 
 #endif

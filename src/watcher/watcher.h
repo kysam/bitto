@@ -12,4 +12,7 @@ public:
   std::vector<BConn> m_conns;
   void SetBList(BList *blist);
   void Run();
+
+private:
+  void Loop();
 };
