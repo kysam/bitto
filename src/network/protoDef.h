@@ -138,11 +138,12 @@ struct BPOp_request_checksums : BPOp {
 		if (m_session->m_type == BSession::kMaster) {
 			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
 			log_protocol("(master) received request");
+/*
 			m_packets.push_back(new BPacket(request_checksums_answer));
 
 			BPacket *packet = m_packets.back();
 			packet->Pack();
-			Send();
+			Send();*/
 		}
 		else if (m_session->m_type == BSession::kSlave) {
 			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
