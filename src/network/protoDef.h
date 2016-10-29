@@ -14,10 +14,7 @@
 #include "session.h"
 
 enum ProtocolCode : unsigned char {
-	//code from slave
 	request_checksums,
-	//code from master
-	request_checksums_answer,
 	ProtocolCode_end
 };
 
@@ -69,6 +66,9 @@ struct BPacket : BLimitBuffer {
 struct BPOp {
 	BPOp(BSession *session) {
 		m_session = session;
+	}
+	~BPOp() {
+		ClearPackets();
 	}
 
 	void ClearPackets() {
@@ -138,7 +138,7 @@ struct BPOp_request_checksums : BPOp {
 		if (m_session->m_type == BSession::kMaster) {
 			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
 			log_protocol("(master) received request");
-			m_packets.push_back(new BPacket(request_checksums_answer));
+			m_packets.push_back(new BPacket(request_checksums));
 
 			BPacket *packet = m_packets.back();
 			packet->Pack();
