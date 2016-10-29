@@ -40,15 +40,17 @@ void BNetwork::Init(BList *blist) {
 }
 
 void BNetwork::Run(const char* name, short port) {
+/*
 	m_ioThread = new std::thread([this] {
 		while (true) {
 			SleepFor(10);
-			m_io_service.run();
+			
 		}
-	});
+	});*/
 
 	Connect();
 	Listen(name, port);
+	m_io_service.run();
 }
 
 void BNetwork::Stop() {
@@ -106,6 +108,7 @@ void BNetwork::Connect() {
 }
 
 void BNetwork::Accept() {
+//	std::shared_ptr<BSession> session = std::make_shared<BSession>(m_io_service);
 	m_acceptor.async_accept(m_accSocket,
 		[this](std::error_code ec) {
 		if (!ec) {

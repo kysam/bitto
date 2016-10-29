@@ -38,17 +38,10 @@ void BSession::StartSlave() {
 }
 
 void BSession::StartMaster() {
-	Receive();
 	NewOperation(new BPOp_request_checksums(this));
 	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
 
-		BPOp_request_checksums::ChecksumGroup group;
-		memcpy(group.path, "test.txt", strlen("test.txt"));
-		op->m_checksumGroups.push_back(group);
-	
-
-	op->Build();
-	op->Send();
+	Receive();
 }
 
 void BSession::Terminate() {
