@@ -42,11 +42,10 @@ void BSession::StartMaster() {
 	NewOperation(new BPOp_request_checksums(this));
 	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
 
-	for (int i = 0; i < m_blistGroup->items.size(); i++) {
 		BPOp_request_checksums::ChecksumGroup group;
 		memcpy(group.path, "test.txt", strlen("test.txt"));
 		op->m_checksumGroups.push_back(group);
-	}
+	
 
 	op->Build();
 	op->Send();
