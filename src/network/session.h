@@ -10,7 +10,7 @@ struct BPOp;
 class BSession
 {
 public:
-	BSession(asio_socket socket);
+	BSession(asio::io_service& io_service);
 	~BSession();
 
 	enum SessionType {

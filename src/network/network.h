@@ -8,13 +8,11 @@
 #include <thread>
 
 struct BMasterTarget {
-	BMasterTarget(asio::io_service& io_service, asio::ip::tcp::resolver::iterator&& it, BListItemGroup* group)
-		: m_socket(io_service),
+	BMasterTarget(asio::ip::tcp::resolver::iterator&& it, BListItemGroup* group) :
 		m_epIterator(it),
 		m_blistGroup(group) {
 	};
 
-	asio_socket m_socket;
 	asio::ip::tcp::resolver::iterator m_epIterator;
 	BListItemGroup *m_blistGroup;
 };

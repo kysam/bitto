@@ -28,7 +28,7 @@ void BNetwork::Init(BList *blist) {
 	for (int i = 0; i < groups.size(); i++) {
 			asio::ip::tcp::resolver::iterator it = resolver.resolve({ groups[i].addr, std::to_string(groups[i].port) });
 			log_network("target %s:%d", groups[i].addr, groups[i].port);
-			m_masterTargets.push_back(BMasterTarget(m_io_service, std::move(it), &groups[i]));
+			m_masterTargets.push_back(BMasterTarget(std::move(it), &groups[i]));
 	}
 
 	m_targetConnectState = new ConnectState[m_masterTargets.size()];
@@ -40,17 +40,16 @@ void BNetwork::Init(BList *blist) {
 }
 
 void BNetwork::Run(const char* name, short port) {
-/*
 	m_ioThread = new std::thread([this] {
 		while (true) {
 			SleepFor(10);
-			
+			m_io_service.run();
 		}
-	});*/
+	});
 
 	Connect();
 	Listen(name, port);
-	m_io_service.run();
+	
 }
 
 void BNetwork::Stop() {
@@ -86,10 +85,11 @@ void BNetwork::Connect() {
 				log_network("connecting to %s", m_masterTargets[i].m_epIterator->host_name().c_str());
 				m_targetConnectState[i] = kConnecting;
 
-				asio::async_connect(m_masterTargets[i].m_socket, m_masterTargets[i].m_epIterator,
-					[this, i](std::error_code ec, asio::ip::tcp::resolver::iterator) {
+				std::shared_ptr<BSession> session = std::make_shared<BSession>(m_io_service);
+				m_sessions.push_back(session);
+				asio::async_connect(session->m_socket, m_masterTargets[i].m_epIterator,
+					[this, session, i](std::error_code ec, asio::ip::tcp::resolver::iterator) {
 					if (!ec) {
-						_ptrSession session = std::make_shared<BSession>(std::move(m_masterTargets[i].m_socket));
 						session->m_type = BSession::kSlave;
 						session->m_blist = m_blist;
 
@@ -108,15 +108,14 @@ void BNetwork::Connect() {
 }
 
 void BNetwork::Accept() {
-//	std::shared_ptr<BSession> session = std::make_shared<BSession>(m_io_service);
-	m_acceptor.async_accept(m_accSocket,
-		[this](std::error_code ec) {
+	std::shared_ptr<BSession> session = std::make_shared<BSession>(m_io_service);
+	m_sessions.push_back(session);
+	m_acceptor.async_accept(session->m_socket,
+		[this, session](std::error_code ec) {
 		if (!ec) {
-			_ptrSession session = std::make_shared<BSession>(std::move(m_accSocket));
-			m_sessions.push_back(session);
-
 			session->m_type = BSession::kMaster;
 			session->Start();
+
 			Accept();
 		}
 		else {
