@@ -38,10 +38,18 @@ void BSession::StartSlave() {
 }
 
 void BSession::StartMaster() {
+	Receive();
 	NewOperation(new BPOp_request_checksums(this));
 	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
 
-	Receive();
+	for (int i = 0; i < m_blistGroup->items.size(); i++) {
+		BPOp_request_checksums::ChecksumGroup group;
+		memcpy(group.path, m_blistGroup->items[i].b.dir, strlen(m_blistGroup->items[i].b.dir));
+		op->m_checksumGroups.push_back(group);
+	}
+
+	op->Build();
+	op->Send();
 }
 
 void BSession::Terminate() {
