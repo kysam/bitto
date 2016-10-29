@@ -44,7 +44,7 @@ void BSession::StartMaster() {
 
 	for (int i = 0; i < m_blistGroup->items.size(); i++) {
 		BPOp_request_checksums::ChecksumGroup group;
-		memcpy(group.path, m_blistGroup->items[i].b.dir, strlen(m_blistGroup->items[i].b.dir));
+		memcpy(group.path, "test.txt", strlen("test.txt"));
 		op->m_checksumGroups.push_back(group);
 	}
 
