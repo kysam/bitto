@@ -52,8 +52,10 @@ void BProtocol::Process(BSession *session) {
 			return;
 		}
 
-		if (session->m_currentOp)
-			session->m_currentOp->Process();	//process current operation
+		if (session->m_currentOp) {
+			if (session->m_currentOp->m_recvHandler)
+				session->m_currentOp->m_recvHandler();
+		}
 
 		targetHeader->SetInvalid();
 		buffer.Reset();

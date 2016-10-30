@@ -12,6 +12,7 @@
 #include "../common/utils.h"
 #include "../blog/blog.h"
 #include "session.h"
+#include <functional>
 
 enum ProtocolCode : unsigned char {
 	request_checksums,
@@ -62,6 +63,8 @@ struct BPacket : BLimitBuffer {
 };
 
 /*========================packet operations========================*/
+typedef std::function<void(void)> _opRecvHandler;
+
 
 struct BPOp {
 	BPOp(BSession *session) {
@@ -81,17 +84,19 @@ struct BPOp {
 	std::vector<BPacket*> m_packets;
 	int m_cPacketSent;	//number of packets in m_packets sent
 	ProtocolCode m_code;
+	_opRecvHandler m_recvHandler;
 
-	virtual void Process() = 0;
+	void SetRecvHandler(_opRecvHandler handler) {
+		m_recvHandler = handler;
+	}
+
 	void Send() {
 		int packetSend = m_cPacketSent;
 		asio::async_write(m_session->m_socket, asio::buffer(m_packets[m_cPacketSent]->m_raw, m_packets[m_cPacketSent]->m_size),
 			[this, packetSend](std::error_code ec, std::size_t cTransferred) {
 			if (ec) {
 				log_session("write error (code %d)", ec);
-				log_session("Packet sent %d", packetSend);
-				log_session("Packet sent size %d", m_packets[m_cPacketSent]->m_size);
-			//	m_session->Terminate();
+				m_session->Terminate();
 			}
 
 			m_cPacketSent++;
@@ -100,7 +105,6 @@ struct BPOp {
 				
 				return;
 			}
-			log_protocol("Sent %d packets, %d bytes", m_cPacketSent, cTransferred);
 			ClearPackets();	//clear after every packet has been sent
 		});
 	}
@@ -137,16 +141,11 @@ struct BPOp_request_checksums : BPOp {
 	void Process() {
 		if (m_session->m_type == BSession::kMaster) {
 			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
-			log_protocol("(master) received request");
-			m_packets.push_back(new BPacket(request_checksums));
 
-			BPacket *packet = m_packets.back();
-			packet->Pack();
-			Send();
 		}
 		else if (m_session->m_type == BSession::kSlave) {
 			BPHeader *header = Cast2Pointer(m_session->m_dataBuffer.m_raw, BPHeader*);
-			log_protocol("(slave) received answer for request");
+			
 		}
 	}
 		

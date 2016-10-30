@@ -23,10 +23,14 @@ void BSession::Start() {
 }
 
 void BSession::StartSlave() {
-	Receive();
 	NewOperation(new BPOp_request_checksums(this));
 	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
+	auto recvHandler = [op] {
+		log_protocol("(slave) received answer for request");
+	};
 
+	op->SetRecvHandler(recvHandler);
+	Receive();
 	for (int i = 0; i < m_blistGroup->items.size(); i++) {
 		BPOp_request_checksums::ChecksumGroup group;
 		memcpy(group.path, m_blistGroup->items[i].b.dir, strlen(m_blistGroup->items[i].b.dir));
@@ -40,7 +44,16 @@ void BSession::StartSlave() {
 void BSession::StartMaster() {
 	NewOperation(new BPOp_request_checksums(this));
 	BPOp_request_checksums *op = reinterpret_cast<BPOp_request_checksums*>(m_currentOp);
+	auto recvHandler = [op] {
+		log_protocol("(master) received request");
+		op->m_packets.push_back(new BPacket(request_checksums));
 
+		BPacket *packet = op->m_packets.back();
+		packet->Pack();
+		op->Send();
+	};
+
+	op->SetRecvHandler(recvHandler);
 	Receive();
 }
 
